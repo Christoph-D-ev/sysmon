@@ -3,12 +3,9 @@
 #include<iostream>
 #include <list>
 
-int core_count=1;
-std::list<int> data_points(100,0);
-int last_idle=0;
-int last_sum=0;
-QLineSeries *main_series;
-std::vector<QLineSeries*> core_series;
+
+std::list<int> data_points(100,1);
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,8 +13,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+     //prime main_series
     main_series = new QLineSeries();
-    //prime main_series
+
+    main_series->setName("CPU");
+
     int i=0;
     for(std::list<int>::iterator it=data_points.begin(); it != data_points.end(); it++){
        main_series->append(i,*it);
@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QChart *chart = new QChart();
 
+
+
      chart->addSeries(main_series);
 
     QCategoryAxis *axisX = new QCategoryAxis();
@@ -36,11 +38,10 @@ MainWindow::MainWindow(QWidget *parent)
     chart->addAxis(axisX, Qt::AlignBottom);
 
     main_series->attachAxis(axisX);
-    main_series->color().black();
+    main_series->setColor(QColor().black());
+
 
     QCategoryAxis *axisY = new QCategoryAxis();
-
-
     axisY->append("10", 10);
     axisY->append("20", 20);
     axisY->append("30", 30);
@@ -54,28 +55,48 @@ MainWindow::MainWindow(QWidget *parent)
     axisY->setRange(0, 100);
     axisY->setGridLineVisible(true);
     chart->addAxis(axisY, Qt::AlignLeft);
+
+//    QLogValueAxis *axisY = new QLogValueAxis();
+//    axisY->setTitleText("Values");
+//    axisY->setLabelFormat("%g");
+//    axisY->setBase(8.0);
+//    axisY->setMinorTickCount(-1);
+//    chart->addAxis(axisY, Qt::AlignLeft);
+
+
+
     main_series->attachAxis(axisY);
 
 
 
     chart->setTitle("line1");
     chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+     chart->legend()->setAlignment(Qt::AlignRight);
+
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setParent(ui->horizontalFrame);
 
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(get_new_info()));
-    timer->start(1000);
-    core_count=get_core_count();
 
-    for(int i=0;i<core_count;i++){
-        core_series.push_back(new QLineSeries);
+    core_count=get_core_count();
+    int hue_counter=0;
+
+    for(int i=1;i<=core_count;i++){
+        //remember
+        core_series.push_back( new Core(i+1,hue_counter,chart,axisX,axisY));
+
+        //hsv hue
+        hue_counter=hue_counter+(300/core_count);
     }
 
 
+
+
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update_series()));
+    timer->start(1000);
 
 
 
@@ -87,6 +108,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::update_series(){
+    MainWindow::get_new_info();
+    for(Core * c:core_series){
+        c->update_series();
+    }
+}
 
 
 void MainWindow::get_new_info()
@@ -100,14 +127,13 @@ void MainWindow::get_new_info()
     stat.ignore(3);
     for(int i=0;i<10;i++){
         stat >> help;
-        std::cout<<"help: "<<help<<std::endl;
+
         if(i==3){
             idle = help;
         }
         sum += help;
     }
-    std::cout<<"idle: "<<idle<<std::endl;
-    std::cout<<"sum: "<<sum<<std::endl;
+
     double percent;
     if(last_sum==0){
         last_idle=idle;
@@ -127,7 +153,7 @@ void MainWindow::get_new_info()
 
     data_points.pop_front();
     data_points.push_back(intpart);
-    std::cout<<"percent: "<<percent<<std::endl;
+    std::cout<<"Main percent: "<<percent<<std::endl;
 
     main_series->clear();
     int i=0;
@@ -140,10 +166,7 @@ void MainWindow::get_new_info()
 
 }
 
-void MainWindow::get_core_info()
-{
 
-}
 
 int MainWindow::get_core_count()
 {

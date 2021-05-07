@@ -6,22 +6,27 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <fstream>
+#include <QTimer>
+#include <iostream>
+#include <unistd.h>
 
-class core
+class Core
 {
 public:
-    core();
-    ~core();
+    Core(int number,int hue,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY );
+    ~Core();
+    QLineSeries *series;
 public slots:
     void update_series();
+
 private:
-    std::string name;
-    QLineSeries series;
+
+
     int hue;
     int number;
     int old_idle;
     int old_sum;
-    std::list<int>data_points;
+    std::list<int> data_points;
 
 };
 

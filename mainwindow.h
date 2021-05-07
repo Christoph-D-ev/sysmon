@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <unistd.h>
 #include <fstream>
+#include "Core.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,16 +21,23 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+     void get_new_info();
 
 public slots:
+     void update_series();
 
-    void get_new_info();
-    void get_core_info();
 private:
     Ui::MainWindow *ui;
 
     int get_core_count();
     std::vector<int> get_colors(int n);
+
+    int core_count=1;
+
+    int last_idle=0;
+    int last_sum=0;
+    QLineSeries *main_series;
+    std::vector<Core* > core_series;
 
 
 };
