@@ -30,7 +30,7 @@ private:
     Ui::MainWindow *ui;
 
     int get_core_count();
-    std::vector<int> get_colors(int n);
+
 
     int core_count=1;
 

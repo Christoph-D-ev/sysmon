@@ -1,6 +1,6 @@
 #include "Core.h"
 
-Core::Core(int number,int hue,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY  )
+Core::Core(int number,QColor color,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY  )
 {
     this->number=number;
 
@@ -10,11 +10,21 @@ Core::Core(int number,int hue,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *
 
     //why qt
     this->series= new QLineSeries;
-    QString name = "core" ;
-    name.append(QString::number(number-1));
-    this->series->setName(name);
+    if(number){
+        QString name = "core" ;
+        name.append(QString::number(number-1));
+        this->series->setName(name);
+        this->series->setColor(color);
 
-    this->series->setColor(QColor().fromHsv(hue,204,255,200));
+    }
+    else{
+        this->series->setName("CPU");
+        this->series->setColor(QColor().fromHsv(300,255,0,255));
+
+
+    }
+
+
 
 
     //this is kinda ugly but it only happens once
@@ -29,7 +39,7 @@ Core::Core(int number,int hue,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *
     chart->addSeries(this->series);
     series->attachAxis(axisX);
     series->attachAxis(axisY);
-   std::cout<<"hi"<<std::endl;
+
 
 
 

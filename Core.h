@@ -13,7 +13,7 @@
 class Core
 {
 public:
-    Core(int number,int hue,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY );
+    Core(int number,QColor color,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY );
     ~Core();
     QLineSeries *series;
 public slots:
