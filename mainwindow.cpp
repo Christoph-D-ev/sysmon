@@ -52,24 +52,69 @@ MainWindow::MainWindow(QWidget *parent)
     core_series.reserve(core_count+1);
 
 
-    //add main series
-    core_series.push_back(new Core(0,QColor().black(),chart,axisX,axisY));
+
 
     //hue_counter is the HSV hue devided by the number of neede colors
     //this produces adequately distinct colors
     int hue_counter=0;
-    for(int i=1;i<=core_count;i++){
+     QChar c = QChar(0xF0);
+    for(int i=0;i<=core_count;i++){
+
+        QCheckBox *button = new QCheckBox (this);
+        //QPushButton *button = new QPushButton(this);
+
+        button->setText( QString(c) +  "core" + QString::number(i));
+        button->setChecked(true);
+
+
+
+        QLabel *lable = new QLabel();
+        lable->setText("");
+
+
+
+
+        QHBoxLayout *hbox = new QHBoxLayout();
+        hbox->setAlignment(Qt::AlignLeft);
+
+        hbox->addWidget(button);
+        hbox->addWidget(lable);
+
+        ui->vertical->addLayout(hbox);
+
         //remember
-        core_series.push_back( new Core(i,QColor().fromHsv(hue_counter,204,255,200),chart,axisX,axisY));
+        if(i==0){
+            //Special for CPU
+             button->setText( QString(c) +  "CPU");
+            core_series.push_back(std::make_pair(new Core(0,QColor().black(),chart,axisX,axisY,button,this),lable));
+        }
+        else{
+            //normal cores
+            button->setText( QString(c) +  "core " + QString::number(i));
+            core_series.push_back(std::make_pair( new Core(i,QColor().fromHsv(hue_counter,204,255,200),chart,axisX,axisY,button,this),lable));
+        }
+
 
         //hsv hue
         hue_counter=hue_counter+(300/core_count);
+
+
+
+
+
     }
 
     //finish chart
     chart->setTitle("cpu utilisation");
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->legend()->setVisible(false);
+    //chart->legend()->setAlignment(Qt::AlignBottom);
+
+    ui->vertical->setAlignment(Qt::AlignLeft);
+
+
+
+
+
 
 
     //add the update function to a timer
@@ -77,26 +122,31 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update_series()));
     //send signal every second
-    timer->start(1000);
-
+    timer->start(500);
 
 
 
 }
 
+//destuctor
 MainWindow::~MainWindow()
 {
-    for(Core *c:core_series){
-        delete c;
+    for(std::pair<Core *,QLabel*>c:core_series){
+        //dont delete the second part because the QT Layout takes ownership of it
+        delete c.first;
     }
     delete ui;
 }
 
+// updates the data and series for every core object
 void MainWindow::update_series(){
 
-    for(Core * c:core_series){
-        c->update_series();
+    for(std::pair<Core *,QLabel*>c:core_series){
+        c.first->update_series();
+        //std::cout<<"test: "<<c.first->get_curr_value()<<std::endl;
+        c.second->setText(QString::number(c.first->get_curr_value(),'f',2)+" %");
     }
+
 }
 
 

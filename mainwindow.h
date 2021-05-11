@@ -6,6 +6,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QTimer>
+#include <QPushButton>
 #include <unistd.h>
 #include <fstream>
 #include "Core.h"
@@ -37,7 +38,8 @@ private:
     int last_idle=0;
     int last_sum=0;
     QLineSeries *main_series;
-    std::vector<Core* > core_series;
+    std::vector<std::pair<Core*,QLabel*>> core_series;
+
 
 
 };

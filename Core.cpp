@@ -1,10 +1,9 @@
 #include "Core.h"
 
-Core::Core(int number,QColor color,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY  )
+Core::Core(int number,QColor color,QChart *chart,QCategoryAxis *axisX,QCategoryAxis *axisY,QCheckBox *check_box,QObject *parent  ):QObject(parent)
 {
     this->number=number;
-
-    this->hue=hue;
+    this->chart=chart;
     this->old_idle=0;
     this->old_sum=0;
 
@@ -40,6 +39,8 @@ Core::Core(int number,QColor color,QChart *chart,QCategoryAxis *axisX,QCategoryA
     series->attachAxis(axisX);
     series->attachAxis(axisY);
 
+    QObject::connect(check_box,&QCheckBox::toggled,this,&Core::release_attach_series);
+
 
 
 
@@ -48,6 +49,11 @@ Core::~Core(){
     //why qt
     delete this->series;
 
+}
+
+float Core::get_curr_value()
+{
+    return this->data_points.back();
 }
 
 void Core::update_series()
@@ -92,17 +98,16 @@ void Core::update_series()
         float delta_sum = sum - this->old_sum;
         percent = delta_sum - delta_idle;
         percent =100*(percent/delta_sum);
-          std::cout<<this->number<<" Core percent: "<<(int)percent<<std::endl;
+          std::cout<<this->number<<" Core percent: "<<percent<<std::endl;
 
         //safe for next time
         this->old_idle=idle;
         this->old_sum=sum;
     }
-    int intpart = (int)percent;
 
     //update datapoints
     this->data_points.pop_front();
-    this->data_points.push_back(intpart);
+    this->data_points.push_back(percent);
 
     //clear series we cant remove because
     //qt doesnt like that dunno why
@@ -117,3 +122,16 @@ void Core::update_series()
 
 
 }
+
+void Core::release_attach_series(bool state)
+{
+    if(state){
+         this->chart->addSeries(this->series);
+    }
+    else{
+        this->chart->removeSeries(this->series);
+    }
+
+}
+
+
