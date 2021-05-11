@@ -57,13 +57,13 @@ MainWindow::MainWindow(QWidget *parent)
     //hue_counter is the HSV hue devided by the number of neede colors
     //this produces adequately distinct colors
     int hue_counter=0;
-     QChar c = QChar(0xF0);
+
     for(int i=0;i<=core_count;i++){
 
         QCheckBox *button = new QCheckBox (this);
         //QPushButton *button = new QPushButton(this);
 
-        button->setText( QString(c) +  "core" + QString::number(i));
+        button->setText( "core" + QString::number(i));
         button->setChecked(true);
 
 
@@ -85,12 +85,12 @@ MainWindow::MainWindow(QWidget *parent)
         //remember
         if(i==0){
             //Special for CPU
-             button->setText( QString(c) +  "CPU");
+             button->setText("CPU  ");
             core_series.push_back(std::make_pair(new Core(0,QColor().black(),chart,axisX,axisY,button,this),lable));
         }
         else{
             //normal cores
-            button->setText( QString(c) +  "core " + QString::number(i));
+            button->setText("core " + QString::number(i));
             core_series.push_back(std::make_pair( new Core(i,QColor().fromHsv(hue_counter,204,255,200),chart,axisX,axisY,button,this),lable));
         }
 
@@ -105,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     //finish chart
-    chart->setTitle("cpu utilisation");
+    chart->setTitle("cpu usage");
     chart->legend()->setVisible(false);
     //chart->legend()->setAlignment(Qt::AlignBottom);
 
@@ -143,8 +143,8 @@ void MainWindow::update_series(){
 
     for(std::pair<Core *,QLabel*>c:core_series){
         c.first->update_series();
-        //std::cout<<"test: "<<c.first->get_curr_value()<<std::endl;
-        c.second->setText(QString::number(c.first->get_curr_value(),'f',2)+" %");
+        //QString::number uses c-style printf formating
+        c.second->setText(QString::number(c.first->get_curr_value(),'f',2)+"%");
     }
 
 }

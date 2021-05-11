@@ -82,7 +82,7 @@ void Core::update_series()
         //get idle
         if(i==3){
             idle = help;
-            std::cout<<"idle: "<<help<<std::endl;
+            //std::cout<<"idle: "<<help<<std::endl;
         }
         sum += help;
     }
@@ -98,7 +98,7 @@ void Core::update_series()
         float delta_sum = sum - this->old_sum;
         percent = delta_sum - delta_idle;
         percent =100*(percent/delta_sum);
-          std::cout<<this->number<<" Core percent: "<<percent<<std::endl;
+         // std::cout<<this->number<<" Core percent: "<<percent<<std::endl;
 
         //safe for next time
         this->old_idle=idle;
