@@ -63,13 +63,21 @@ MainWindow::MainWindow(QWidget *parent)
         QCheckBox *button = new QCheckBox (this);
         //QPushButton *button = new QPushButton(this);
 
-        button->setText( "core" + QString::number(i));
+
         button->setChecked(true);
 
 
 
+
+
+
         QLabel *lable = new QLabel();
+        //do this or the first second looks wierdly drawn
         lable->setText("");
+
+        QLabel *color_dot = new QLabel();
+        //do this or the first second looks wierdly drawn
+        color_dot->setText(" ");
 
 
 
@@ -78,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
         hbox->setAlignment(Qt::AlignLeft);
 
         hbox->addWidget(button);
+        hbox->addWidget(color_dot);
         hbox->addWidget(lable);
 
         ui->vertical->addLayout(hbox);
@@ -85,12 +94,17 @@ MainWindow::MainWindow(QWidget *parent)
         //remember
         if(i==0){
             //Special for CPU
-             button->setText("CPU  ");
+             button->setText("CPU");
+
+             color_dot->setStyleSheet(QString("QLabel{ background-color: black; border: none }"));
+
             core_series.push_back(std::make_pair(new Core(0,QColor().black(),chart,axisX,axisY,button,this),lable));
         }
         else{
             //normal cores
             button->setText("core " + QString::number(i));
+            color_dot->setStyleSheet(QString("QLabel{ background-color: %1; border: none }").arg(QColor().fromHsv(hue_counter,204,255,200).name()));
+
             core_series.push_back(std::make_pair( new Core(i,QColor().fromHsv(hue_counter,204,255,200),chart,axisX,axisY,button,this),lable));
         }
 
